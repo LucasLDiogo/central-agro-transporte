@@ -1,0 +1,97 @@
+{
+  "versao": 3,
+  "titulo": "Central Agro & Transporte",
+  "subtitulo": "Logística · Passo Fundo / RS",
+  "dadosUrl": "https://raw.githubusercontent.com/LucasLDiogo/central-agro-transporte/dados/dados.json",
+  "cidade": {
+    "nome": "Passo Fundo",
+    "lat": -28.2628,
+    "lon": -52.4067
+  },
+  "rota": [
+    {
+      "nome": "Passo Fundo",
+      "lat": -28.2628,
+      "lon": -52.4067
+    },
+    {
+      "nome": "Soledade",
+      "lat": -28.8183,
+      "lon": -52.5103
+    },
+    {
+      "nome": "Lajeado",
+      "lat": -29.4669,
+      "lon": -51.9614
+    },
+    {
+      "nome": "Porto Alegre",
+      "lat": -30.0346,
+      "lon": -51.2177
+    },
+    {
+      "nome": "Camaquã",
+      "lat": -30.8511,
+      "lon": -51.8122
+    },
+    {
+      "nome": "Pelotas",
+      "lat": -31.7654,
+      "lon": -52.3376
+    },
+    {
+      "nome": "Rio Grande",
+      "lat": -32.035,
+      "lon": -52.0986
+    }
+  ],
+  "noticias": [
+    {
+      "id": "antt",
+      "nome": "ANTT",
+      "busca": "intitle:ANTT"
+    },
+    {
+      "id": "frete",
+      "nome": "Frete",
+      "busca": "intitle:frete OR \"piso mínimo de frete\" OR intitle:caminhoneiros OR intitle:transportadoras"
+    },
+    {
+      "id": "rio_grande",
+      "nome": "Rota Rio Grande",
+      "busca": "\"Porto do Rio Grande\" OR \"Portos RS\" OR intitle:\"BR-392\" OR intitle:\"BR-116\" OR intitle:\"BR-386\""
+    },
+    {
+      "id": "diesel",
+      "nome": "Diesel e combustíveis",
+      "busca": "intitle:diesel OR intitle:combustíveis"
+    },
+    {
+      "id": "agro",
+      "nome": "Soja e trigo",
+      "busca": "intitle:soja OR intitle:trigo"
+    },
+    {
+      "id": "biodiesel",
+      "nome": "Biodiesel",
+      "busca": "intitle:biodiesel"
+    }
+  ],
+  "telas": {
+    "segundosPorTela": 26,
+    "ordem": [
+      "clima",
+      "mercado",
+      "comparativo",
+      "rota",
+      "noticias",
+      "video"
+    ]
+  },
+  "avatar": {
+    "bocejaAposSeg": 150,
+    "dormeAposSeg": 420
+  },
+  "recados": [],
+  "videos": []
+}

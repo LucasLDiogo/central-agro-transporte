@@ -1,0 +1,50 @@
+name: Atualizar dados
+
+# Coleta cambio, graos, diesel, avisos do INMET e noticias a cada 20 minutos
+# e publica o arquivo dados.json no ramo "dados" (o painel le esse arquivo).
+on:
+  schedule:
+    - cron: '7,27,47 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['coletor/**', 'config.json', '.github/workflows/dados.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dados
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      REPO: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+    steps:
+      - name: Baixar o projeto
+        run: git clone --quiet --depth 1 "$REPO" projeto
+
+      - name: Recuperar a coleta anterior (mantem o historico do CEPEA)
+        run: |
+          mkdir -p saida
+          if git clone --quiet --depth 1 --branch dados "$REPO" anterior 2>/dev/null; then
+            cp anterior/dados.json saida/dados.json
+          else
+            cp projeto/data/dados.json saida/dados.json || true
+          fi
+
+      - name: Coletar
+        run: python3 projeto/coletor/coletar.py saida/dados.json
+
+      - name: Publicar no ramo dados
+        run: |
+          cd saida
+          git init --quiet --initial-branch dados
+          git config user.name "central-agro-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados.json
+          git commit --quiet -m "dados $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push --quiet --force "$REPO" dados
