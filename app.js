@@ -155,9 +155,9 @@ const TELAS = {
   }, fala() {
     const u = moeda('USD'), s = E.dados.cbot?.soja_cbot;
     if (u && u.dia >= 0.5) return { texto: `**Tem um gato no telhado**: dólar subindo ${nf(u.dia)}% hoje, a R$ ${nf(u.valor)}.`, tom: 'alerta' };
-    if (u && u.dia <= -0.5) return { texto: `Dólar caindo ${nf(Math.abs(u.dia))}% hoje, a R$ ${nf(u.valor)}. Olha aí, **coiudo**!`, tom: 'ok' };
+    if (u && u.dia <= -0.5) return { texto: `Dólar caindo ${nf(Math.abs(u.dia))}% hoje, a R$ ${nf(u.valor)}. Olha aí, **Cuiudo**!`, tom: 'ok' };
     if (s && s.var_dia_pct >= 1) return { texto: `Soja subindo ${nf(s.var_dia_pct)}% em Chicago. **Joia rara**!`, tom: 'festa' };
-    return { texto: `Mercado sem susto por enquanto, **pia do pai**. Dólar a R$ ${u ? nf(u.valor) : '—'}.`, tom: 'ok' };
+    return { texto: `Mercado sem susto por enquanto, **Pia do Vô**. Dólar a R$ ${u ? nf(u.valor) : '—'}.`, tom: 'ok' };
   } },
 
   comparativo: { nome: 'Comparativo 30 dias', pronto: () => !!E.dados?.cambio?.USD, itens() {
@@ -195,7 +195,7 @@ const TELAS = {
       </div>`;
   }, fala() {
     const m = this.itens().filter(x => x.d30 != null).sort((a, b) => Math.abs(b.d30) - Math.abs(a.d30))[0];
-    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olha aí, **coiudo**!`, tom: m.nome === 'Dólar' && m.d30 > 3 ? 'alerta' : 'ok' } : null;
+    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olha aí, **Cuiudo**!`, tom: m.nome === 'Dólar' && m.d30 > 3 ? 'alerta' : 'ok' } : null;
   } },
 
   rota: { nome: 'Rota até Rio Grande', pronto: () => !!E.rota, risco: p => p.mm >= 30 ? 'perigo' : (p.mm >= 10 || p.prob >= 75) ? 'atencao' : '', render() {
@@ -248,7 +248,7 @@ const TELAS = {
     if (semAnim) return troca();
     gsap.timeline().to(el, { opacity: 0, y: -18, duration: .3, ease: 'power2.in', onComplete: troca }).fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .5, ease: 'power3.out' });
   }, entrar() { clearInterval(this.tmr); this.tmr = setInterval(() => this.proxima(), 7000); }, sair() { clearInterval(this.tmr); }, fala() {
-    const n = this.fila?.[0]; return { texto: n ? `Central de notícias no ar, **pia do pai**! Tem novidade em ${n.cat}.` : 'Central de notícias no ar, **pia do pai**!', tom: 'ok' };
+    const n = this.fila?.[0]; return { texto: n ? `Central de notícias no ar, **Pia do Vô**! Tem novidade em ${n.cat}.` : 'Central de notícias no ar, **Pia do Vô**!', tom: 'ok' };
   } },
 
   video: { nome: 'Vídeo em destaque', pronto: () => videos().length > 0, render() { }, entrar(fim) {
@@ -271,7 +271,7 @@ const TELAS = {
   } },
 };
 function videos() { const u = params.get('video'); const extra = u ? [/^[\w-]{11}$/.test(u) ? { youtube: u, titulo: 'Vídeo' } : { src: u, titulo: 'Vídeo' }] : []; return [...extra, ...(E.cfg?.videos || [])]; }
-function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom dia com alegria**, **joia preciosa**!' : h < 18 ? 'Boa tarde, **joia rara**!' : 'Boa noite, **pia do pai**!'; }
+function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom dia com alegria**, **joia preciosa**!' : h < 18 ? 'Boa tarde, **joia rara**!' : 'Boa noite, **Pia do Vô**!'; }
 
 /* ------------------------------------------------------------------ avatar
    Cada clipe e um MP4 "empilhado": cor na metade de cima, mascara na de baixo. O WebGL junta os dois (fundo transparente). */
@@ -332,7 +332,7 @@ const Avatar = {
   },
   bocejar() {
     if (this.estado !== 'acordado') return; this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + 7000;
-    this.tocar('bocejo'); setTimeout(() => { if (this.atual === 'bocejo') this.falar(['Uaaah… que calmaria, **pia do pai**.', 'Uaaah… bateu aquele soninho, **coiudo**.', 'Uaaah… alguém passa um café aí, **joia rara**?'][Math.floor(Math.random() * 3)], 'ok', false); }, 3400);
+    this.tocar('bocejo'); setTimeout(() => { if (this.atual === 'bocejo') this.falar(['Uaaah… que calmaria, **Pia do Vô**.', 'Uaaah… bateu aquele soninho, **Cuiudo**.', 'Uaaah… alguém passa um café aí, **joia rara**?'][Math.floor(Math.random() * 3)], 'ok', false); }, 3400);
   },
   dormir() {
     if (this.estado !== 'acordado') return; this.estado = 'dormindo'; gsap.set('#balao', { visibility: 'hidden', opacity: 0 });
@@ -343,7 +343,7 @@ const Avatar = {
   acordar(falar = true) {
     if (this.estado !== 'dormindo') return; this.estado = 'acordando'; this.tlZ?.kill(); gsap.to('#zzz b', { opacity: 0, duration: .2 }); gsap.killTweensOf('#avatar'); gsap.to('#avatar', { rotation: 0, duration: .3 });
     this.ultimoBocejo = Date.now();
-    this.tocar('acordar', () => { this.estado = 'acordado'; this.tocar('repouso'); if (falar) this.falar('Opa! Tô ligado, **coiudo**!', 'ok', 'surpresa'); });
+    this.tocar('acordar', () => { this.estado = 'acordado'; this.tocar('repouso'); if (falar) this.falar('Opa! Tô ligado, **Cuiudo**!', 'ok', 'surpresa'); });
   },
 };
 
