@@ -195,7 +195,7 @@ const TELAS = {
       </div>`;
   }, fala() {
     const m = this.itens().filter(x => x.d30 != null).sort((a, b) => Math.abs(b.d30) - Math.abs(a.d30))[0];
-    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olha aí, **Cuiudo**!`, tom: m.nome === 'Dólar' && m.d30 > 3 ? 'alerta' : 'ok' } : null;
+    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olha aí, **Cuiudo**!`, tom: 'ok', gesto: 'pensa' } : null;
   } },
 
   rota: { nome: 'Rota até Rio Grande', pronto: () => !!E.rota, risco: p => p.mm >= 30 ? 'perigo' : (p.mm >= 10 || p.prob >= 75) ? 'atencao' : '', render() {
@@ -276,7 +276,7 @@ function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom di
 /* ------------------------------------------------------------------ avatar
    Cada clipe e um MP4 "empilhado": cor na metade de cima, mascara na de baixo. O WebGL junta os dois (fundo transparente). */
 const Avatar = {
-  clipes: ['repouso', 'sorriso', 'bocejo', 'olha', 'surpresa', 'aceno', 'risada', 'falando', 'dormir', 'dormindo', 'acordar'],
+  clipes: ['repouso', 'sorriso', 'bocejo', 'olha', 'surpresa', 'aceno', 'risada', 'falando', 'dormir', 'dormindo', 'acordar', 'chimarrao', 'espicha', 'joinha', 'pensa'],
   repetem: { repouso: 1, dormindo: 1 }, v: {}, atual: null, estado: 'acordado', ocupadoAte: 0, ultimoBocejo: Date.now(),
   iniciar() {
     const cv = $('#avatarGl'); let gl = null; try { gl = cv.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }); } catch (e) { }
@@ -326,7 +326,7 @@ const Avatar = {
       .fromTo(palavras, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .22, stagger: .075, ease: 'power2.out' }, '-=.25')
       .to(b, { opacity: 0, scale: .85, y: -14, duration: .35, ease: 'power2.in', onComplete: () => gsap.set(b, { visibility: 'hidden' }) }, dur);
     if (gesto === false) return; // so o balao, sem trocar o clipe que esta tocando
-    const g = gesto || (tom === 'alerta' ? 'surpresa' : tom === 'festa' ? 'risada' : 'falando');
+    const g = (gesto && this.v[gesto]) ? gesto : (tom === 'alerta' ? 'surpresa' : tom === 'festa' ? (this.v.joinha ? 'joinha' : 'risada') : 'falando');
     this.tocar(g, g === 'falando' ? null : () => this.tocar('falando'));
     gsap.fromTo('#avatar', { y: 0 }, { y: -14, duration: .22, yoyo: true, repeat: 1, ease: 'power2.out' });
   },
@@ -334,6 +334,16 @@ const Avatar = {
     if (this.estado !== 'acordado') return; this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + 7000;
     this.tocar('bocejo'); setTimeout(() => { if (this.atual === 'bocejo') this.falar(['Uaaah… que calmaria, **Pia do Vô**.', 'Uaaah… bateu aquele soninho, **Cuiudo**.', 'Uaaah… alguém passa um café aí, **joia rara**?'][Math.floor(Math.random() * 3)], 'ok', false); }, 3400);
   },
+  /* gesto solto (chimarrao, espichar, joinha...) com uma frase opcional no meio */
+  gesto(nome, frases, atraso = 1500) {
+    if (this.estado !== 'acordado' || !this.v[nome]) return false; this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + (this.v[nome].duration || 8) * 1000;
+    this.tocar(nome); if (frases) setTimeout(() => { if (this.atual === nome) this.falar(frases[Math.floor(Math.random() * frases.length)], 'ok', false); }, atraso);
+    return true;
+  },
+  chimarrao() { return this.gesto('chimarrao', ['Hora do chimarrão, **Pia do Vô**!', 'Um mate pra acompanhar as notícias, **Cuiudo**.', 'Chimarrão na cuia e olho no painel, **joia rara**!'], 2600); },
+  espichar() { return this.gesto('espicha', ['Deixa eu me espichar um pouco, **Pia do Vô**…', 'Aaah… uma espichada pra seguir o dia, **Cuiudo**!'], 1200); },
+  /* muito tempo sem novidade: alterna bocejo, chimarrao e espichada */
+  ocioso() { const lista = ['bocejo', 'chimarrao', 'espicha'].filter(n => this.v[n]); this.vez = ((this.vez ?? -1) + 1) % lista.length; const n = lista[this.vez]; return n === 'chimarrao' ? this.chimarrao() : n === 'espicha' ? this.espichar() : this.bocejar(); },
   dormir() {
     if (this.estado !== 'acordado') return; this.estado = 'dormindo'; gsap.set('#balao', { visibility: 'hidden', opacity: 0 });
     this.tocar('dormir', () => this.tocar('dormindo'));
@@ -347,7 +357,7 @@ const Avatar = {
   },
 };
 
-/* ------------------------------------------------------------------ troca de telas: o avatar puxa a proxima pela corda */
+/* ------------------------------------------------------------------ troca de telas: o avatar puxa a proxima */
 const Show = { ordem: [], pos: -1, pausado: false, trocando: false, ultimaTroca: Date.now(),
   disponiveis() { return E.cfg.telas.ordem.filter(id => TELAS[id] && TELAS[id].pronto()); },
   programacao() {
@@ -362,20 +372,17 @@ const Show = { ordem: [], pos: -1, pausado: false, trocando: false, ultimaTroca:
     gsap.killTweensOf('#programacao u'); gsap.set('#programacao u', { scaleX: 0 }); this.tempo?.kill(); if (velha) TELAS[velha].sair?.();
     if (Avatar.estado === 'dormindo') Avatar.acordar(false);
     nova.render(); this.atual = id; this.programacao();
-    const corda = $('#corda'), fio = $('path', corda), no = $('circle', corda), ax = 300, ay = 770;
-    const desenha = () => { const bx = 500 + gsap.getProperty(sec, 'x') - 4, by = 556; fio.setAttribute('d', `M${ax} ${ay} Q${(ax + bx) / 2} ${Math.max(ay, by) + 46 + Math.min(120, (bx - ax) * .05)} ${bx} ${by}`); no.setAttribute('cx', bx); no.setAttribute('cy', by); };
     const tl = gsap.timeline({ onComplete: () => { this.trocando = false; this.depois(id); } });
     if (secVelha) tl.to(secVelha, { x: -140, opacity: 0, scale: .96, duration: .45, ease: 'power2.in', onComplete: () => gsap.set(secVelha, { visibility: 'hidden' }) });
     tl.add(() => { if (Avatar.estado === 'acordado') Avatar.tocar('olha'); }, 0)
-      .set(sec, { visibility: 'visible', x: 1480, opacity: 1, scale: 1 }, '>-0.1').add(desenha).to(corda, { opacity: 1, duration: .2 })
-      .to('#avatar', { x: 34, rotation: 5, duration: .28, ease: 'power2.out' }, '<')            // estica o braco
-      .to(sec, { x: 760, duration: .5, ease: 'power3.out', onUpdate: desenha })                  // primeiro puxao
+      .set(sec, { visibility: 'visible', x: 1480, opacity: 1, scale: 1 }, '>-0.1')
+      .to('#avatar', { x: 34, rotation: 5, duration: .28, ease: 'power2.out' })                 // se prepara
+      .to(sec, { x: 760, duration: .5, ease: 'power3.out' })                  // primeiro puxao
       .to('#avatar', { x: -26, rotation: -6, duration: .5, ease: 'power3.out' }, '<')
       .to('#avatar', { x: 10, rotation: 3, duration: .2, ease: 'power1.inOut' })                 // toma folego
-      .to(sec, { x: 0, duration: .7, ease: 'back.out(1.15)', onUpdate: desenha })                // segundo puxao
+      .to(sec, { x: 0, duration: .7, ease: 'back.out(1.15)' })                // segundo puxao
       .to('#avatar', { x: -30, rotation: -7, duration: .45, ease: 'power3.out' }, '<')
-      .to(corda, { opacity: 0, duration: .25 }, '>-0.15')
-      .to('#avatar', { x: 0, rotation: 0, duration: .7, ease: 'elastic.out(1,.55)' }, '<')
+      .to('#avatar', { x: 0, rotation: 0, duration: .7, ease: 'elastic.out(1,.55)' }, '>-0.15')
       .from($$('.anima', sec), { opacity: 0, y: 34, duration: .55, stagger: .06, ease: 'power3.out', clearProps: 'opacity,transform' }, '-=1.0');
     $$('.traco', sec).forEach(t => { const n = t.getTotalLength ? t.getTotalLength() : 0; if (n) { gsap.set(t, { strokeDasharray: n, strokeDashoffset: n }); tl.to(t, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, '-=1.0'); } });
     if ($$('.ponta', sec).length) tl.from($$('.ponta', sec), { opacity: 0, duration: .4, stagger: .08 }, '-=.4');
@@ -384,7 +391,7 @@ const Show = { ordem: [], pos: -1, pausado: false, trocando: false, ultimaTroca:
   depois(id) {
     const tela = TELAS[id]; const fim = () => { if (this.atual === id && !this.pausado) this.proxima(); };
     const propria = tela.entrar?.(fim);
-    const f = tela.fala?.(); if (f && Avatar.estado === 'acordado') setTimeout(() => this.atual === id && Avatar.falar(f.texto, f.tom, this.primeira ? null : (this.primeira = true, 'aceno')), 350);
+    const f = tela.fala?.(); if (f && Avatar.estado === 'acordado') setTimeout(() => this.atual === id && Avatar.falar(f.texto, f.tom, this.primeira ? f.gesto : (this.primeira = true, 'aceno')), 350);
     if (propria === true) return;
     const li = $(`#programacao li[data-id="${id}"] u`), seg = +(params.get('seg') || E.cfg.telas.segundosPorTela);
     this.tempo = gsap.fromTo(li, { scaleX: 0 }, { scaleX: 1, duration: seg, ease: 'none', onComplete: fim }); if (this.pausado) this.tempo.pause();
@@ -431,7 +438,7 @@ function tedio() {
   const parado = (agora - Show.ultimaTroca) / 1000;
   if (Avatar.estado === 'acordado' && Avatar.livre()) {
     if ((Show.pausado && parado > a.dormeAposSeg) || (madrugada && parado > 14 && Show.atual !== 'video')) return Avatar.dormir();
-    if ((agora - Avatar.ultimoBocejo) / 1000 > a.bocejaAposSeg && parado > 12 && Show.atual !== 'video') return Avatar.bocejar();
+    if ((agora - Avatar.ultimoBocejo) / 1000 > a.bocejaAposSeg && parado > 12 && Show.atual !== 'video') return Avatar.ocioso();
     if (Math.random() < .16) Avatar.tocar('sorriso');
   }
 }
@@ -454,7 +461,7 @@ async function iniciar() {
   addEventListener('dblclick', telaCheia);
   addEventListener('keydown', ev => {
     if (Avatar.estado === 'dormindo' && !['d', 'D'].includes(ev.key)) Avatar.acordar();
-    ({ ArrowRight: () => Show.proxima(1), ArrowLeft: () => Show.proxima(-1), ' ': () => Show.pausar(), f: telaCheia, F: telaCheia, b: () => Avatar.bocejar(), B: () => Avatar.bocejar(), d: () => Avatar.dormir(), D: () => Avatar.dormir(),
+    ({ ArrowRight: () => Show.proxima(1), ArrowLeft: () => Show.proxima(-1), ' ': () => Show.pausar(), f: telaCheia, F: telaCheia, b: () => Avatar.bocejar(), B: () => Avatar.bocejar(), c: () => Avatar.chimarrao(), C: () => Avatar.chimarrao(), e: () => Avatar.espichar(), E: () => Avatar.espichar(), j: () => Avatar.gesto('joinha'), J: () => Avatar.gesto('joinha'), d: () => Avatar.dormir(), D: () => Avatar.dormir(),
       h: () => { const a = $('#ajuda'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }, H: () => { const a = $('#ajuda'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; } })[ev.key]?.();
     const n = parseInt(ev.key, 10); if (n >= 1 && n <= Show.ordem.length) Show.ir(Show.ordem[n - 1]);
   });

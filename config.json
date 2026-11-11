@@ -1,5 +1,5 @@
 {
-  "versao": 3,
+  "versao": 5,
   "titulo": "Central Agro & Transporte",
   "subtitulo": "Logística · Passo Fundo / RS",
   "dadosUrl": "https://raw.githubusercontent.com/LucasLDiogo/central-agro-transporte/dados/dados.json",
@@ -78,7 +78,7 @@
     }
   ],
   "telas": {
-    "segundosPorTela": 26,
+    "segundosPorTela": 45,
     "ordem": [
       "clima",
       "mercado",
