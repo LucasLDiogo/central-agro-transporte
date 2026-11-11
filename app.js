@@ -327,7 +327,7 @@ const Avatar = {
       .to(b, { opacity: 0, scale: .85, y: -14, duration: .35, ease: 'power2.in', onComplete: () => gsap.set(b, { visibility: 'hidden' }) }, dur);
     if (gesto === false) return; // so o balao, sem trocar o clipe que esta tocando
     const g = (gesto && this.v[gesto]) ? gesto : (tom === 'alerta' ? 'surpresa' : tom === 'festa' ? (this.v.joinha ? 'joinha' : 'risada') : 'falando');
-    this.tocar(g, g === 'falando' ? null : () => this.tocar('falando'));
+    this.tocar(g, ['surpresa', 'aceno'].includes(g) ? () => this.tocar('falando') : null); // gestos longos nao emendam a fala
     gsap.fromTo('#avatar', { y: 0 }, { y: -14, duration: .22, yoyo: true, repeat: 1, ease: 'power2.out' });
   },
   bocejar() {
