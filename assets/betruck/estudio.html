@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Estúdio do BeTruck · Be8</title>
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<style>
+:root{--navy:#081F2E;--navy7:#0E2A3C;--navy6:#14384F;--line:#1E3A4F;--text:#E6EEF2;--muted:#8FA9B8;--teal:#0EB194;--lime:#55C94F;--red:#E5484D;--amber:#F2B705;--tit:'Montserrat','Poppins',Arial,sans-serif;--txt:'Inter','Segoe UI',Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#040d14;color:var(--text);font-family:var(--txt)}
+body{min-height:100vh}
+header{display:flex;align-items:center;gap:18px;padding:18px 28px;border-bottom:2px solid var(--teal);background:#06141d}
+header h1{font:800 26px var(--tit)}
+header h1 span{color:var(--teal)}
+header p{color:var(--muted);font-size:14px;margin-top:2px}
+header .tag{margin-left:auto;font:700 12px var(--tit);letter-spacing:2px;text-transform:uppercase;color:var(--navy);background:var(--teal);padding:6px 12px;border-radius:999px}
+main{display:grid;grid-template-columns:minmax(360px,560px) 1fr;gap:22px;padding:22px 28px 0}
+#palco{position:relative;height:640px;border-radius:24px;overflow:hidden;background:radial-gradient(circle at 50% 70%,#123650 0%,#0B2232 55%,#081F2E 100%);border:1px solid var(--navy6)}
+#palco .aura{position:absolute;left:50%;bottom:-120px;width:460px;height:460px;margin-left:-230px;border-radius:50%;background:radial-gradient(circle,rgba(14,177,148,.45) 0%,rgba(14,177,148,.1) 45%,transparent 70%);transition:background .4s}
+#palco.alerta .aura{background:radial-gradient(circle,rgba(229,72,77,.6) 0%,rgba(229,72,77,.16) 45%,transparent 70%)}
+#bt{position:absolute;left:50%;bottom:6px;width:500px;max-width:96%;aspect-ratio:540/598;transform:translateX(-50%)}
+#bt svg{width:100%;height:100%;overflow:visible}
+#balao{position:absolute;left:24px;right:24px;top:18px;z-index:3;padding:14px 18px;border-radius:18px 18px 18px 6px;background:#F4F7F9;color:#0B1F2C;font:600 19px/1.3 var(--txt);box-shadow:0 14px 30px rgba(0,0,0,.35);opacity:0;transform:translateY(-8px);transition:opacity .3s,transform .3s}
+#balao.on{opacity:1;transform:none}
+#balao b{color:#087e6a;font-weight:800}
+#balao.alerta{background:#FFE9E9;box-shadow:0 0 0 3px var(--red),0 14px 30px rgba(0,0,0,.35)}
+#balao.alerta b{color:#B3262B}
+#estrada{position:relative;height:250px;margin:22px 28px 0;border-radius:20px;overflow:hidden;background:linear-gradient(#0B2232,#081F2E);border:1px solid var(--navy6)}
+#estrada:after{content:"";position:absolute;left:0;right:0;bottom:22px;height:4px;background:repeating-linear-gradient(90deg,var(--teal) 0 40px,transparent 40px 70px);opacity:.5}
+#estrada .dica{position:absolute;left:20px;top:14px;font:600 13px var(--txt);color:var(--muted)}
+.lado{display:flex;flex-direction:column;gap:16px}
+.card{background:linear-gradient(160deg,rgba(14,42,60,.94),rgba(11,22,32,.94));border:1px solid var(--navy6);border-radius:18px;padding:16px 18px}
+.card h2{font:800 13px var(--tit);letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.bts{display:flex;flex-wrap:wrap;gap:8px}
+button{font:600 14px var(--txt);color:var(--text);background:var(--navy6);border:1px solid #1F4A66;border-radius:10px;padding:8px 12px;cursor:pointer;transition:background .15s,transform .1s}
+button:hover{background:#1A4A68}
+button:active{transform:scale(.97)}
+button.on{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+button.vermelho{background:rgba(229,72,77,.18);border-color:var(--red)}
+button.vermelho.on{background:var(--red);color:#fff}
+button kbd{font:700 11px var(--tit);opacity:.6;margin-left:6px}
+.kpi{display:grid;grid-template-columns:auto 1fr auto;gap:10px 14px;align-items:center}
+.kpi label{font:600 14px var(--txt);color:var(--muted)}
+.kpi input{width:100%;accent-color:var(--teal)}
+.kpi output{font:800 18px var(--tit);font-variant-numeric:tabular-nums;min-width:86px;text-align:right}
+.kpi output.alta{color:var(--lime)} .kpi output.baixa{color:var(--red)}
+.status{margin-top:10px;font:600 14px var(--txt);color:var(--muted)}
+.status b{color:var(--text)}
+.persona{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:14px;line-height:1.45}
+.persona p{color:var(--muted)}
+.persona p b{color:var(--text)}
+.bordoes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bordoes span{font:700 13px var(--txt);padding:5px 10px;border-radius:999px;background:rgba(14,177,148,.14);border:1px solid rgba(14,177,148,.4);cursor:pointer}
+.bordoes span.al{background:rgba(229,72,77,.14);border-color:rgba(229,72,77,.5)}
+footer{padding:18px 28px 26px;color:var(--muted);font-size:13px}
+@media (max-width:980px){main{grid-template-columns:1fr}#palco{height:560px}.persona{grid-template-columns:1fr}}
+@media (max-width:600px){header .tag{display:none}header h1{font-size:22px}main{padding:16px 14px 0}#estrada{margin:16px 14px 0}#palco{height:500px}footer{padding:16px 14px 22px}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1><span>Be</span>Truck · estúdio do mascote</h1>
+    <p>Caminhão-tanque Be8 BeVant · Logística e Transporte · Passo Fundo/RS</p>
+  </div>
+  <span class="tag">substitui o Jerrard</span>
+</header>
+
+<main>
+  <section id="palco">
+    <i class="aura"></i>
+    <div id="balao"><p></p></div>
+    <div id="bt"></div>
+  </section>
+
+  <section class="lado">
+    <div class="card">
+      <h2>Indicador simulado: fica vermelho quando sai da faixa</h2>
+      <div class="kpi">
+        <label for="dolar">Dólar no dia</label><input id="dolar" type="range" min="-2" max="2" step="0.05" value="0"><output id="dolarV">0,00%</output>
+        <label for="chuva">Chance de chuva</label><input id="chuva" type="range" min="0" max="100" step="1" value="20"><output id="chuvaV">20%</output>
+      </div>
+      <p class="status">Regra do painel: alerta com dólar ≥ +0,5%, chuva ≥ 60%, soja ≤ −1% ou aviso na rota. Agora: <b id="estado">tudo dentro da faixa</b></p>
+    </div>
+
+    <div class="card">
+      <h2>Gracinhas</h2>
+      <div class="bts" id="gracinhas"></div>
+    </div>
+
+    <div class="card">
+      <h2>Expressões</h2>
+      <div class="bts" id="expressoes"></div>
+    </div>
+
+    <div class="card">
+      <h2>Persona</h2>
+      <div class="persona" id="persona"></div>
+      <div class="bordoes" id="bordoes"></div>
+    </div>
+  </section>
+</main>
+
+<section id="estrada"><span class="dica">Estrada: aperte "Rodar na tela" e o BeTruck passa aqui de corpo inteiro</span></section>
+
+<footer>Clique num bordão para o BeTruck falar. Atalhos: A alerta · C mangote · E limpador · L lavar vidro · V BeVant · J joinha · P piscar farol · R rodar · B bocejar · D dormir.<br>Desenvolvido por Lucas L. Diogo para a Be8 — 2026</footer>
+
+<script src="betruck.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const bt = new BeTruck($('#bt'), { palco: $('#estrada'), pistaBase: 14, zzz: true });
+window.bt = bt;
+
+/* balão com **bordões** em negrito + boca sincronizada */
+let tBalao;
+function falar(texto, tom = 'ok') {
+  const b = $('#balao');
+  b.className = tom === 'alerta' ? 'alerta' : '';
+  $('#balao p').innerHTML = esc(texto).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  requestAnimationFrame(() => b.classList.add('on'));
+  const palavras = texto.split(/\s+/).length;
+  bt.falar(palavras * .3 + .9);
+  clearTimeout(tBalao); tBalao = setTimeout(() => b.classList.remove('on'), Math.max(3800, palavras * 420 + 2000));
+}
+
+/* alerta */
+const btAlerta = document.createElement('button');
+function alerta(on, texto) {
+  bt.alerta(on); $('#palco').classList.toggle('alerta', on); btAlerta.classList.toggle('on', on);
+  if (on && texto) falar(texto, 'alerta');
+}
+
+/* gracinhas */
+const G = [
+  ['Piscar farol', 'p', () => { bt.piscadinha(); falar('**Fom-fom!** Buzina eu não tenho, mas farol eu pisco, **comboio**!'); }],
+  ['Limpador', 'e', () => { bt.limpador(); setTimeout(() => falar('Visão limpa, **estrada limpa**!'), 500); }],
+  ['Lavar vidro', 'l', () => bt.lavarVidro().then(ok => ok && falar('Banho de para-brisa! **Estrada limpa**, tchê!'))],
+  ['Mangote de BeVant', 'c', () => bt.mangote().then(ok => ok && falar('**Tanque cheio, tchê!** Agora sim.'))],
+  ['Frasco BeVant', 'v', () => { bt.bevant(); setTimeout(() => falar('**É renovável, é BeVant agora!**'), 1900); }],
+  ['Joinha', 'j', () => { bt.joinha(); falar('**Carga liberada!**'); }],
+  ['Acenar', '', () => { bt.acenar(); falar('**Bom dia, comboio!**'); }],
+  ['Pensar', '', () => bt.pensar(2.5)],
+  ['Comemorar', '', () => { bt.comemorar(); falar('Soja subindo! **Carga liberada!**'); }],
+  ['Surpresa', '', () => bt.surpresa()],
+  ['Tonto', '', () => bt.tonto()],
+  ['Bocejar', 'b', () => { bt.bocejar(); setTimeout(() => falar('Uaaah… **motor em marcha lenta**, comboio.'), 2400); }],
+  ['Dormir / acordar', 'd', () => bt.estado === 'dormindo' ? (bt.acordar(), setTimeout(() => falar('Opa! **Motor ligado**, comboio!'), 600)) : bt.dormir()],
+  ['Rodar na tela', 'r', () => bt.rodar().then(ok => ok && falar('Dei uma voltinha e já voltei, **comboio**! **Bora rodar renovável!**'))],
+];
+const atalhos = {};
+for (const [nome, k, fn] of G) {
+  const b = document.createElement('button'); b.innerHTML = esc(nome) + (k ? `<kbd>${k.toUpperCase()}</kbd>` : ''); b.onclick = fn; $('#gracinhas').appendChild(b);
+  if (k) atalhos[k] = fn;
+}
+btAlerta.className = 'vermelho'; btAlerta.innerHTML = 'Alerta (liga / desliga)<kbd>A</kbd>';
+btAlerta.onclick = () => alerta(!bt.emAlerta, '**Pisca-alerta ligado!** Indicador fora da faixa.');
+$('#gracinhas').prepend(btAlerta); atalhos.a = btAlerta.onclick;
+
+/* expressões */
+for (const e of BeTruck.expressoes) {
+  const b = document.createElement('button'); b.textContent = e;
+  b.onclick = () => { if (bt.emAlerta) alerta(false); if (bt.estado === 'dormindo') bt.acordar(false); bt.expressao(e); document.querySelectorAll('#expressoes button').forEach(x => x.classList.toggle('on', x === b)); };
+  $('#expressoes').appendChild(b);
+}
+
+/* persona */
+const P = BeTruck.persona;
+$('#persona').innerHTML = `<p><b>${esc(P.nome)}</b> (apelido: ${esc(P.apelido)})<br>${esc(P.quem)}</p>
+  <p><b>Jeito:</b> ${esc(P.tracos.join(', '))}.<br><b>Trata o público por:</b> comboio, parceiro de estrada, tchê.<br><b>Sem som:</b> “buzina” piscando o farol.</p>`;
+for (const [tipo, lista] of Object.entries(P.bordoes)) for (const f of lista) {
+  const s = document.createElement('span'); s.className = tipo === 'alerta' ? 'al' : ''; s.textContent = f.replace(/\*\*/g, '');
+  s.onclick = () => tipo === 'alerta' ? alerta(true, f) : (bt.emAlerta && alerta(false), falar(f));
+  $('#bordoes').appendChild(s);
+}
+
+/* indicador simulado */
+const fmt = v => (v > 0 ? '+' : '') + v.toFixed(2).replace('.', ',') + '%';
+let ultimo = 'ok';
+function checar() {
+  const d = +$('#dolar').value, c = +$('#chuva').value;
+  const o = $('#dolarV'); o.textContent = fmt(d); o.className = d > .005 ? 'alta' : d < -.005 ? 'baixa' : '';
+  $('#chuvaV').textContent = c + '%';
+  const motivo = d >= .5 ? `**Luz vermelha no painel!** Dólar subindo ${fmt(d)} hoje.` : c >= 60 ? `**Pisca-alerta ligado!** ${c}% de chance de chuva hoje em Passo Fundo.` : null;
+  $('#estado').textContent = motivo ? 'ALERTA: ' + motivo.replace(/\*\*/g, '') : d <= -.5 ? 'dólar caindo: notícia boa' : 'tudo dentro da faixa';
+  const agora = motivo ? 'alerta' : d <= -.5 ? 'bom' : 'ok';
+  if (agora === ultimo) return; ultimo = agora;
+  if (agora === 'alerta') alerta(true, motivo);
+  else { if (bt.emAlerta) alerta(false); if (agora === 'bom') { bt.joinha(); falar(`Dólar caindo ${fmt(d)}. **Estrada limpa**, comboio!`); } }
+}
+$('#dolar').oninput = checar; $('#chuva').oninput = checar;
+
+addEventListener('keydown', ev => { if (ev.target.tagName === 'INPUT') return; const f = atalhos[ev.key.toLowerCase()]; if (f) { ev.preventDefault(); f(); } });
+setTimeout(() => { bt.acenar(); falar('**Bom dia, comboio!** Eu sou o **BeTruck**. **Bora rodar renovável!**'); }, 700);
+</script>
+</body>
+</html>

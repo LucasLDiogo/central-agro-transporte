@@ -123,7 +123,7 @@ const TELAS = {
       </div>`;
   }, fala() {
     const c = E.clima.current, prob = E.clima.daily.precipitation_probability_max[0], [desc] = WMO(c.weather_code);
-    if (prob >= 60) return { texto: `**Tem um gato no telhado**: ${nf(prob, 0)}% de chance de chuva hoje em ${E.cfg.cidade.nome}.`, tom: 'alerta' };
+    if (prob >= 60) return { texto: `**Pisca-alerta ligado!** ${nf(prob, 0)}% de chance de chuva hoje em ${E.cfg.cidade.nome}.`, tom: 'alerta' };
     return { texto: `${saudacao()} Agora em ${E.cfg.cidade.nome}: ${nf(c.temperature_2m, 0)}° e ${desc.toLowerCase()}.`, tom: 'ok' };
   } },
 
@@ -154,10 +154,11 @@ const TELAS = {
       </div>`;
   }, fala() {
     const u = moeda('USD'), s = E.dados.cbot?.soja_cbot;
-    if (u && u.dia >= 0.5) return { texto: `**Tem um gato no telhado**: dólar subindo ${nf(u.dia)}% hoje, a R$ ${nf(u.valor)}.`, tom: 'alerta' };
-    if (u && u.dia <= -0.5) return { texto: `Dólar caindo ${nf(Math.abs(u.dia))}% hoje, a R$ ${nf(u.valor)}. Olha aí, **Cuiudo**!`, tom: 'ok' };
-    if (s && s.var_dia_pct >= 1) return { texto: `Soja subindo ${nf(s.var_dia_pct)}% em Chicago. **Joia rara**!`, tom: 'festa' };
-    return { texto: `Mercado sem susto por enquanto, **Pia do Vô**. Dólar a R$ ${u ? nf(u.valor) : '—'}.`, tom: 'ok' };
+    if (u && u.dia >= 0.5) return { texto: `**Luz vermelha no painel!** Dólar subindo ${nf(u.dia)}% hoje, a R$ ${nf(u.valor)}.`, tom: 'alerta' };
+    if (u && u.dia <= -0.5) return { texto: `Dólar caindo ${nf(Math.abs(u.dia))}% hoje, a R$ ${nf(u.valor)}. **Estrada limpa**, comboio!`, tom: 'ok', gesto: 'joinha' };
+    if (s && s.var_dia_pct <= -1) return { texto: `**Pé no freio, comboio!** Soja caindo ${nf(Math.abs(s.var_dia_pct))}% em Chicago.`, tom: 'alerta' };
+    if (s && s.var_dia_pct >= 1) return { texto: `Soja subindo ${nf(s.var_dia_pct)}% em Chicago. **Carga liberada!**`, tom: 'festa' };
+    return { texto: `Mercado sem susto por enquanto, **comboio**. Dólar a R$ ${u ? nf(u.valor) : '—'}.`, tom: 'ok' };
   } },
 
   comparativo: { nome: 'Comparativo 30 dias', pronto: () => !!E.dados?.cambio?.USD, itens() {
@@ -195,7 +196,7 @@ const TELAS = {
       </div>`;
   }, fala() {
     const m = this.itens().filter(x => x.d30 != null).sort((a, b) => Math.abs(b.d30) - Math.abs(a.d30))[0];
-    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olha aí, **Cuiudo**!`, tom: 'ok', gesto: 'pensa' } : null;
+    return m ? { texto: `Em 30 dias, quem mais se mexeu foi ${m.nome.toLowerCase() === 'soja' ? 'a soja' : 'o ' + m.nome.toLowerCase()}: ${pct(m.d30)}. Olho no retrovisor, **comboio**!`, tom: 'ok', gesto: 'pensa' } : null;
   } },
 
   rota: { nome: 'Rota até Rio Grande', pronto: () => !!E.rota, risco: p => p.mm >= 30 ? 'perigo' : (p.mm >= 10 || p.prob >= 75) ? 'atencao' : '', render() {
@@ -223,9 +224,9 @@ const TELAS = {
     gsap.to('#trilhoCor', { strokeDashoffset: -300, duration: 10, ease: 'none', repeat: -1 });
   }, fala() {
     const pior = [...E.rota].sort((a, b) => b.mm - a.mm)[0]; const av = (E.dados?.alertas || [])[0];
-    if (av) return { texto: `**Tem um gato no telhado** na rota: aviso de ${av.descricao.toLowerCase()} em ${av.cidades[0]}.`, tom: 'alerta' };
-    if (this.risco(pior)) return { texto: `**Tem um gato no telhado** na rota: ${nf(pior.mm, 0)} mm de chuva previstos em ${pior.nome}.`, tom: 'alerta' };
-    return { texto: 'Rota até Rio Grande sem chuva forte prevista. **Joia preciosa**!', tom: 'festa' };
+    if (av) return { texto: `**Pisca-alerta ligado** na rota: aviso de ${av.descricao.toLowerCase()} em ${av.cidades[0]}.`, tom: 'alerta' };
+    if (this.risco(pior)) return { texto: `**Pé no freio, comboio!** ${nf(pior.mm, 0)} mm de chuva previstos em ${pior.nome}.`, tom: 'alerta' };
+    return { texto: 'Rota até Rio Grande sem chuva forte prevista. **Estrada limpa**, tchê!', tom: 'festa' };
   } },
 
   noticias: { nome: 'Central de notícias', pronto: () => Object.values(E.dados?.noticias || {}).some(l => l.length), todas() {
@@ -248,7 +249,7 @@ const TELAS = {
     if (semAnim) return troca();
     gsap.timeline().to(el, { opacity: 0, y: -18, duration: .3, ease: 'power2.in', onComplete: troca }).fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .5, ease: 'power3.out' });
   }, entrar() { clearInterval(this.tmr); this.tmr = setInterval(() => this.proxima(), 7000); }, sair() { clearInterval(this.tmr); }, fala() {
-    const n = this.fila?.[0]; return { texto: n ? `Central de notícias no ar, **Pia do Vô**! Tem novidade em ${n.cat}.` : 'Central de notícias no ar, **Pia do Vô**!', tom: 'ok' };
+    const n = this.fila?.[0]; return { texto: n ? `Central de notícias no ar, **comboio**! Tem novidade em ${n.cat}.` : 'Central de notícias no ar, **comboio**!', tom: 'ok' };
   } },
 
   video: { nome: 'Vídeo em destaque', pronto: () => videos().length > 0, render() { }, entrar(fim) {
@@ -267,49 +268,37 @@ const TELAS = {
     this.olhar = setInterval(() => Avatar.tocar('olha'), 21000);
     return true; // a propria tela decide quando terminar
   }, sair() { clearTimeout(this.tmax); clearInterval(this.olhar); window.removeEventListener('message', this.ouvir); setTimeout(() => { $('#t-video').innerHTML = ''; }, 600); }, fala() {
-    return { texto: 'Presta atenção nesse vídeo, **joia rara**!', tom: 'ok' };
+    return { texto: 'Presta atenção nesse vídeo, **parceiro de estrada**!', tom: 'ok' };
   } },
 };
 function videos() { const u = params.get('video'); const extra = u ? [/^[\w-]{11}$/.test(u) ? { youtube: u, titulo: 'Vídeo' } : { src: u, titulo: 'Vídeo' }] : []; return [...extra, ...(E.cfg?.videos || [])]; }
-function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom dia com alegria**, **joia preciosa**!' : h < 18 ? 'Boa tarde, **joia rara**!' : 'Boa noite, **Pia do Vô**!'; }
+function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom dia, comboio!**' : h < 18 ? 'Boa tarde, **parceiro de estrada**!' : 'Boa noite, **comboio**! Farol baixo e atenção.'; }
 
-/* ------------------------------------------------------------------ avatar
-   Cada clipe e um MP4 "empilhado": cor na metade de cima, mascara na de baixo. O WebGL junta os dois (fundo transparente). */
+/* ------------------------------------------------------------------ avatar: BeTruck
+   Caminhão-tanque Be8 BeVant em SVG animado (assets/betruck/betruck.js). Mantém a mesma interface do avatar antigo
+   (tocar, falar, bocejar, dormir, acordar, ocioso...) para o resto do painel continuar igual. */
+const TELAS_INDICADOR = new Set(['clima', 'mercado', 'comparativo', 'rota']);
 const Avatar = {
-  clipes: ['repouso', 'sorriso', 'bocejo', 'olha', 'surpresa', 'aceno', 'risada', 'falando', 'dormir', 'dormindo', 'acordar', 'chimarrao', 'espicha', 'joinha', 'pensa'],
-  repetem: { repouso: 1, dormindo: 1 }, v: {}, atual: null, estado: 'acordado', ocupadoAte: 0, ultimoBocejo: Date.now(),
+  estado: 'acordado', ocupadoAte: 0, ultimoBocejo: Date.now(), atual: 'repouso', bt: null, vez: -1,
   iniciar() {
-    const cv = $('#avatarGl'); let gl = null; try { gl = cv.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false }); } catch (e) { }
-    if (!gl) return; this.gl = gl;
-    const sh = (tipo, src) => { const s = gl.createShader(tipo); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const pr = gl.createProgram();
-    gl.attachShader(pr, sh(gl.VERTEX_SHADER, 'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}'));
-    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, 'precision mediump float;uniform sampler2D t;varying vec2 uv;void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.498+.001)).rgb;float a=smoothstep(.06,.94,texture2D(t,vec2(uv.x,.501+uv.y*.498)).r);gl_FragColor=vec4(c*a,a);}'));
-    gl.linkProgram(pr); gl.useProgram(pr);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
-    for (const [k, val] of [[gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR]]) gl.texParameteri(gl.TEXTURE_2D, k, val);
-    for (const nome of this.clipes) {
-      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.loop = !!this.repetem[nome]; el.src = `assets/avatar/${nome}.mp4?v=${E.cfg.versao || 1}`;
-      el.addEventListener('ended', () => { if (this.atual === nome) this.terminou(nome); });
-      el.addEventListener('error', () => { delete this.v[nome]; });
-      this.v[nome] = el;
-    }
-    const desenhar = () => { const el = this.v[this.mostrando]; if (el && el.readyState >= 2) { try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (!this.visivel) { this.visivel = true; cv.style.opacity = 1; $('#avatarImg').style.opacity = 0; } } catch (e) { } } requestAnimationFrame(desenhar); };
-    requestAnimationFrame(desenhar);
-    this.tocar('repouso');
+    if (typeof BeTruck === 'undefined') return;
+    this.bt = new BeTruck($('#betruck'), { palco: $('#palco'), pistaBase: 72 });
     gsap.to('#avatar .aura', { scale: 1.08, opacity: .8, duration: 3.2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
   },
-  /* toca um clipe; a troca so aparece quando o primeiro quadro do novo clipe esta pronto (sem piscar) */
+  /* nomes dos clipes antigos -> gestos do BeTruck */
   tocar(nome, aoFim) {
-    const el = this.v[nome]; if (!el) { aoFim && aoFim(); return; }
-    this.atual = nome; this.aoFim = aoFim || null; try { el.currentTime = 0; } catch (e) { }
-    const troca = () => { if (this.atual !== nome) return; const antigo = this.mostrando; this.mostrando = nome; if (antigo && antigo !== nome) this.v[antigo]?.pause(); };
-    el.play().then(() => { el.requestVideoFrameCallback ? el.requestVideoFrameCallback(troca) : setTimeout(troca, 60); }).catch(() => { if (nome !== 'repouso') this.terminou(nome); });
+    const bt = this.bt; if (!bt) { aoFim && aoFim(); return; }
+    this.atual = nome;
+    const g = {
+      repouso: () => bt.expressao(bt.humor), sorriso: () => (Math.random() < .3 ? bt.piscadinha() : bt.piscar(2)), olha: () => bt.olhaTela(.9),
+      surpresa: () => bt.surpresa(), aceno: () => bt.acenar(), risada: () => bt.comemorar(), joinha: () => bt.joinha(), pensa: () => bt.pensar(2.5),
+      bocejo: () => bt.bocejar(), chimarrao: () => bt.mangote(), espicha: () => bt.limpador()
+    }[nome];
+    Promise.resolve(g ? g() : null).then(() => { if (this.atual === nome) this.atual = 'repouso'; aoFim && aoFim(); });
   },
-  terminou(nome) { const f = this.aoFim; this.aoFim = null; if (f) return f(); if (this.estado === 'dormindo') return this.tocar('dormindo'); this.tocar('repouso'); },
-  livre() { return this.estado === 'acordado' && Date.now() > this.ocupadoAte && (this.atual === 'repouso' || !this.gl); },
+  livre() { return this.estado === 'acordado' && Date.now() > this.ocupadoAte && !!this.bt && !this.bt.ocupado && !this.bt.emAlerta; },
+  /* alerta de indicador: cabine vermelha, giroflex e farol piscando (sem som). Sai sozinho na troca de tela. */
+  alerta(ligar = true) { $('#avatar').classList.toggle('alerta', ligar); this.bt?.alerta(ligar); },
 
   /* fala: balao com as palavras entrando uma a uma; **negrito** marca os bordoes */
   falar(texto, tom = 'ok', gesto) {
@@ -325,35 +314,46 @@ const Avatar = {
       .fromTo(b, { opacity: 0, scale: .4, y: 40, rotation: -6 }, { opacity: 1, scale: 1, y: 0, rotation: 0, duration: .55, ease: 'back.out(1.7)' })
       .fromTo(palavras, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: .22, stagger: .075, ease: 'power2.out' }, '-=.25')
       .to(b, { opacity: 0, scale: .85, y: -14, duration: .35, ease: 'power2.in', onComplete: () => gsap.set(b, { visibility: 'hidden' }) }, dur);
-    if (gesto === false) return; // so o balao, sem trocar o clipe que esta tocando
-    const g = (gesto && this.v[gesto]) ? gesto : (tom === 'alerta' ? 'surpresa' : tom === 'festa' ? (this.v.joinha ? 'joinha' : 'risada') : 'falando');
-    this.tocar(g, ['surpresa', 'aceno'].includes(g) ? () => this.tocar('falando') : null); // gestos longos nao emendam a fala
+    const bt = this.bt; if (!bt) return;
+    bt.falar(Math.min(dur - 1, palavras.length * .3 + .9)); // sincronia da boca (grade) com o balao
     gsap.fromTo('#avatar', { y: 0 }, { y: -14, duration: .22, yoyo: true, repeat: 1, ease: 'power2.out' });
+    if (tom === 'alerta') { if (TELAS_INDICADOR.has(Show.atual)) return this.alerta(true); return bt.expressao('bravo', false), setTimeout(() => bt.piscadinha(), 1800); }
+    if (gesto === false) return; // so o balao, sem trocar o gesto em andamento
+    if (tom === 'festa') return void bt.comemorar();
+    const mapa = { pensa: () => bt.pensar(2.5), aceno: () => bt.acenar(), surpresa: () => bt.surpresa(), joinha: () => bt.joinha(), risada: () => bt.comemorar() };
+    (mapa[gesto] || (() => bt.expressao(Math.random() < .5 ? 'radiante' : 'feliz', false)))();
   },
-  bocejar() {
-    if (this.estado !== 'acordado') return; this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + 7000;
-    this.tocar('bocejo'); setTimeout(() => { if (this.atual === 'bocejo') this.falar(['Uaaah… que calmaria, **Pia do Vô**.', 'Uaaah… bateu aquele soninho, **Cuiudo**.', 'Uaaah… alguém passa um café aí, **joia rara**?'][Math.floor(Math.random() * 3)], 'ok', false); }, 3400);
-  },
-  /* gesto solto (chimarrao, espichar, joinha...) com uma frase opcional no meio */
-  gesto(nome, frases, atraso = 1500) {
-    if (this.estado !== 'acordado' || !this.v[nome]) return false; this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + (this.v[nome].duration || 8) * 1000;
-    this.tocar(nome); if (frases) setTimeout(() => { if (this.atual === nome) this.falar(frases[Math.floor(Math.random() * frases.length)], 'ok', false); }, atraso);
+  /* gracinha com frase: atraso em ms, ou 'fim' para falar quando o gesto termina */
+  gesto(nome, frases, atraso = 1200) {
+    const bt = this.bt; if (this.estado !== 'acordado' || !bt || bt.emAlerta || typeof bt[nome] !== 'function') return false;
+    this.ultimoBocejo = Date.now(); this.ocupadoAte = Date.now() + 7000;
+    const fala = () => frases && this.estado === 'acordado' && !bt.emAlerta && this.falar(frases[Math.floor(Math.random() * frases.length)], 'ok', false);
+    const r = bt[nome]();
+    if (atraso === 'fim') Promise.resolve(r).then(ok => ok && fala()); else setTimeout(fala, atraso);
     return true;
   },
-  chimarrao() { return this.gesto('chimarrao', ['Hora do chimarrão, **Pia do Vô**!', 'Um mate pra acompanhar as notícias, **Cuiudo**.', 'Chimarrão na cuia e olho no painel, **joia rara**!'], 2600); },
-  espichar() { return this.gesto('espicha', ['Deixa eu me espichar um pouco, **Pia do Vô**…', 'Aaah… uma espichada pra seguir o dia, **Cuiudo**!'], 1200); },
-  /* muito tempo sem novidade: alterna bocejo, chimarrao e espichada */
-  ocioso() { const lista = ['bocejo', 'chimarrao', 'espicha'].filter(n => this.v[n]); this.vez = ((this.vez ?? -1) + 1) % lista.length; const n = lista[this.vez]; return n === 'chimarrao' ? this.chimarrao() : n === 'espicha' ? this.espichar() : this.bocejar(); },
+  bocejar() { return this.gesto('bocejar', ['Uaaah… **motor em marcha lenta**, comboio.', 'Uaaah… bateu aquele soninho de estrada, **tchê**.', 'Uaaah… alguém liga o pisca que eu vou dar uma cochilada?'], 2400); },
+  mangote() { return this.gesto('mangote', ['Só um golinho de **BeVant** pra seguir viagem…', '**Tanque cheio, tchê!** Agora sim.', 'Abastecido com **BeVant**: **bora rodar renovável!**'], 'fim'); },
+  limpador() { return this.gesto('limpador', ['Deixa eu dar um trato no para-brisa, **comboio**…', 'Visão limpa, **estrada limpa**!'], 500); },
+  lavar() { return this.gesto('lavarVidro', ['Banho de para-brisa! **Estrada limpa**, tchê!', 'Eita, água no olho! Mas agora tô vendo tudo, **comboio**.'], 'fim'); },
+  bevant() { return this.gesto('bevant', ['**É renovável, é BeVant agora!**', 'Olha o que eu trouxe: **BeVant**! **Bora rodar renovável!**'], 1900); },
+  joinha() { return this.gesto('joinha', ['**Carga liberada!**', 'Tudo nos conformes, **comboio**!'], 400); },
+  piscadinha() { return this.gesto('piscadinha', ['**Fom-fom!** Buzina eu não tenho, mas farol eu pisco, **comboio**!', 'Pisquei o farol pra ti, **parceiro de estrada**!'], 300); },
+  rodar() { return this.gesto('rodar', ['Dei uma voltinha e já voltei, **comboio**! **Bora rodar renovável!**', '**Partiu, comboio!** Uma volta no pátio e tô de volta.'], 'fim'); },
+  /* muito tempo sem novidade: alterna as gracinhas */
+  ocioso() {
+    const lista = ['bocejar', 'limpador', 'mangote', 'piscadinha', 'bevant', 'lavar', 'rodar'];
+    this.vez = (this.vez + 1) % lista.length; return this[lista[this.vez]]();
+  },
   dormir() {
-    if (this.estado !== 'acordado') return; this.estado = 'dormindo'; gsap.set('#balao', { visibility: 'hidden', opacity: 0 });
-    this.tocar('dormir', () => this.tocar('dormindo'));
-    this.tlZ = gsap.timeline({ repeat: -1, delay: 3 }); $$('#zzz b').forEach((z, i) => this.tlZ.fromTo(z, { x: 0, y: 0, opacity: 0, scale: .5 + i * .25 }, { x: 60 + i * 26, y: -110 - i * 40, opacity: 1, scale: 1 + i * .3, duration: 2.2, ease: 'sine.out' }, i * .7).to(z, { opacity: 0, duration: .5 }, i * .7 + 1.9));
-    gsap.to('#avatar', { rotation: 2.5, duration: 2.6, yoyo: true, repeat: -1, ease: 'sine.inOut', transformOrigin: '50% 100%' });
+    if (this.estado !== 'acordado' || !this.bt) return; this.alerta(false); this.estado = 'dormindo'; gsap.set('#balao', { visibility: 'hidden', opacity: 0 });
+    this.bt.dormir();
+    this.tlZ = gsap.timeline({ repeat: -1, delay: 2 }); $$('#zzz b').forEach((z, i) => this.tlZ.fromTo(z, { x: 0, y: 0, opacity: 0, scale: .5 + i * .25 }, { x: 60 + i * 26, y: -110 - i * 40, opacity: 1, scale: 1 + i * .3, duration: 2.2, ease: 'sine.out' }, i * .7).to(z, { opacity: 0, duration: .5 }, i * .7 + 1.9));
   },
   acordar(falar = true) {
-    if (this.estado !== 'dormindo') return; this.estado = 'acordando'; this.tlZ?.kill(); gsap.to('#zzz b', { opacity: 0, duration: .2 }); gsap.killTweensOf('#avatar'); gsap.to('#avatar', { rotation: 0, duration: .3 });
-    this.ultimoBocejo = Date.now();
-    this.tocar('acordar', () => { this.estado = 'acordado'; this.tocar('repouso'); if (falar) this.falar('Opa! Tô ligado, **Cuiudo**!', 'ok', 'surpresa'); });
+    if (this.estado !== 'dormindo') return; this.estado = 'acordado'; this.tlZ?.kill(); gsap.to('#zzz b', { opacity: 0, duration: .2 });
+    this.ultimoBocejo = Date.now(); this.bt?.acordar();
+    if (falar) setTimeout(() => this.falar('Opa! **Motor ligado**, comboio!', 'ok', false), 600);
   },
 };
 
@@ -371,6 +371,7 @@ const Show = { ordem: [], pos: -1, pausado: false, trocando: false, ultimaTroca:
     const velha = this.atual, nova = TELAS[id], sec = $('#t-' + id), secVelha = velha && $('#t-' + velha);
     gsap.killTweensOf('#programacao u'); gsap.set('#programacao u', { scaleX: 0 }); this.tempo?.kill(); if (velha) TELAS[velha].sair?.();
     if (Avatar.estado === 'dormindo') Avatar.acordar(false);
+    Avatar.alerta(false);
     nova.render(); this.atual = id; this.programacao();
     const tl = gsap.timeline({ onComplete: () => { this.trocando = false; this.depois(id); } });
     if (secVelha) tl.to(secVelha, { x: -140, opacity: 0, scale: .96, duration: .45, ease: 'power2.in', onComplete: () => gsap.set(secVelha, { visibility: 'hidden' }) });
@@ -460,9 +461,12 @@ async function iniciar() {
   const telaCheia = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.().catch(() => { }); };
   addEventListener('dblclick', telaCheia);
   addEventListener('keydown', ev => {
-    if (Avatar.estado === 'dormindo' && !['d', 'D'].includes(ev.key)) Avatar.acordar();
-    ({ ArrowRight: () => Show.proxima(1), ArrowLeft: () => Show.proxima(-1), ' ': () => Show.pausar(), f: telaCheia, F: telaCheia, b: () => Avatar.bocejar(), B: () => Avatar.bocejar(), c: () => Avatar.chimarrao(), C: () => Avatar.chimarrao(), e: () => Avatar.espichar(), E: () => Avatar.espichar(), j: () => Avatar.gesto('joinha'), J: () => Avatar.gesto('joinha'), d: () => Avatar.dormir(), D: () => Avatar.dormir(),
-      h: () => { const a = $('#ajuda'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }, H: () => { const a = $('#ajuda'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; } })[ev.key]?.();
+    if (Avatar.estado === 'dormindo' && !['d', 'D'].includes(ev.key)) return Avatar.acordar();
+    const ajuda = () => { const a = $('#ajuda'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; };
+    const tecla = ev.key.length === 1 ? ev.key.toLowerCase() : ev.key;
+    ({ ArrowRight: () => Show.proxima(1), ArrowLeft: () => Show.proxima(-1), ' ': () => Show.pausar(), f: telaCheia, h: ajuda, d: () => Avatar.dormir(),
+      b: () => Avatar.bocejar(), c: () => Avatar.mangote(), e: () => Avatar.limpador(), l: () => Avatar.lavar(), v: () => Avatar.bevant(),
+      j: () => Avatar.joinha(), p: () => Avatar.piscadinha(), r: () => Avatar.rodar(), a: () => Avatar.alerta(!Avatar.bt?.emAlerta) })[tecla]?.();
     const n = parseInt(ev.key, 10); if (n >= 1 && n <= Show.ordem.length) Show.ir(Show.ordem[n - 1]);
   });
   try { const trava = () => navigator.wakeLock?.request('screen').catch(() => { }); trava(); document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && trava()); } catch (e) { }
