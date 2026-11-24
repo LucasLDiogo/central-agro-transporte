@@ -171,10 +171,13 @@ def alertas():
     for quando in ("hoje", "futuro"):
         for a in bruto.get(quando, []):
             municipios = a.get("municipios", "")
-            atingidas = [c for c in cidades if f"{c} - RS (" in municipios]
+            if not isinstance(municipios, str):  # o INMET passou a mandar listas em alguns campos
+                municipios = json.dumps(municipios, ensure_ascii=False)
+            atingidas = [c for c in cidades if f"{c} - RS (" in municipios or f'"{c}"' in municipios]
             if not atingidas:
                 continue
-            riscos = re.findall(r"'([^']+)'", a.get("riscos", "")) or [a.get("riscos", "")]
+            r = a.get("riscos", "")
+            riscos = [str(x).strip() for x in r if x] if isinstance(r, list) else (re.findall(r"'([^']+)'", str(r)) or [str(r)])
             saida.append({"quando": quando, "descricao": a.get("descricao"), "severidade": a.get("severidade"),
                           "cor": a.get("aviso_cor"), "inicio": a.get("inicio"), "fim": a.get("fim"),
                           "cidades": atingidas, "risco": riscos[0].strip() if riscos else ""})
@@ -230,6 +233,7 @@ def energia():
 
 # ---------------------------------------------------------------- ANP: sintese semanal (biodiesel, diesel A, PPI, diesel S10)
 ANP = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos"
+ANP_ESPELHO = "https://raw.githubusercontent.com/LucasLDiogo/central-agro-transporte/anp/anp.json"
 LINHA3 = r"(\d{2}/\d{2}/\d{4})\s+(\d+,\d{2})\s+(-?\d+,\d{2})%\s+(-?\d+,\d{2})%"
 LINHA_PPI = r"(\d{2}/\d{2}/\d{4})\s+(\d+,\d{2})\s+(\d+,\d{2})\s+(-?\d+,\d{2})%"
 
@@ -496,6 +500,19 @@ def main():
             dados[nome] = antigo.get(nome, [] if nome == "alertas" else {})
             dados["falhas"][nome] = f"{type(erro).__name__}: {str(erro)[:200]}"
             print(f"FALHA {nome}: {dados['falhas'][nome]}")
+    # o site da ANP (gov.br) recusa conexoes do GitHub Actions: usa a copia coletada no PC (ramo "anp", coletor/anp-local.ps1)
+    faltam = [k for k in ("anp_semanal", "anp_postos", "anp_mensal") if k in dados["falhas"] or not dados.get(k)]
+    if faltam and so is None:
+        try:
+            espelho = json.loads(baixar(CONFIG.get("anpEspelho", ANP_ESPELHO) + f"?t={int(dt.datetime.now().timestamp()) // 600}"))
+            for k in faltam:
+                v = espelho.get(k)
+                if isinstance(v, dict) and v and v.get("coletado_em", "") >= (dados.get(k) or {}).get("coletado_em", ""):
+                    dados[k] = dict(v, via="coleta no PC (ramo anp)")
+                    dados["falhas"].pop(k, None)
+                    print(f"espelho {k} ({v.get('coletado_em')})")
+        except Exception as erro:
+            dados["falhas"]["anp_espelho"] = f"{type(erro).__name__}: {str(erro)[:200]}"
     if isinstance(dados["cepea"], dict) and isinstance(antigo.get("cepea"), dict):  # indicadores que sumiram do widget
         for k, v in antigo["cepea"].items():
             dados["cepea"].setdefault(k, v)
