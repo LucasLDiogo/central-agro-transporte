@@ -1,5 +1,5 @@
 {
-  "versao": 6,
+  "versao": 7,
   "titulo": "Central Agro & Transporte",
   "subtitulo": "Logística · Passo Fundo / RS",
   "dadosUrl": "https://raw.githubusercontent.com/LucasLDiogo/central-agro-transporte/dados/dados.json",
@@ -75,6 +75,11 @@
       "id": "biodiesel",
       "nome": "Biodiesel",
       "busca": "intitle:biodiesel"
+    },
+    {
+      "id": "lavouras",
+      "nome": "Lavouras RS",
+      "busca": "Emater (soja OR trigo OR milho OR lavouras) RS"
     }
   ],
   "telas": {
@@ -82,8 +87,13 @@
     "ordem": [
       "clima",
       "mercado",
+      "energia",
+      "combustiveis",
+      "safra",
       "comparativo",
       "rota",
+      "frete",
+      "cenario",
       "noticias",
       "video"
     ]
@@ -93,5 +103,151 @@
     "dormeAposSeg": 420
   },
   "recados": [],
-  "videos": []
+  "videos": [],
+  "cotacoesUrl": "",
+  "postos_cidades": [
+    "Passo Fundo",
+    "Carazinho",
+    "Cruz Alta",
+    "Ijuí",
+    "Santa Rosa",
+    "Erechim",
+    "Lajeado",
+    "Porto Alegre",
+    "Pelotas",
+    "Rio Grande"
+  ],
+  "lavouras": [
+    {
+      "nome": "Passo Fundo",
+      "lat": -28.2628,
+      "lon": -52.4067
+    },
+    {
+      "nome": "Carazinho",
+      "lat": -28.2839,
+      "lon": -52.7864
+    },
+    {
+      "nome": "Cruz Alta",
+      "lat": -28.6386,
+      "lon": -53.6064
+    },
+    {
+      "nome": "Ijuí",
+      "lat": -28.388,
+      "lon": -53.9147
+    },
+    {
+      "nome": "Santa Rosa",
+      "lat": -27.8708,
+      "lon": -54.4814
+    },
+    {
+      "nome": "Santo Ângelo",
+      "lat": -28.2992,
+      "lon": -54.2633
+    },
+    {
+      "nome": "Palmeira das Missões",
+      "lat": -27.8994,
+      "lon": -53.3136
+    },
+    {
+      "nome": "Erechim",
+      "lat": -27.6336,
+      "lon": -52.2736
+    },
+    {
+      "nome": "Tupanciretã",
+      "lat": -29.0806,
+      "lon": -53.8361
+    },
+    {
+      "nome": "São Luiz Gonzaga",
+      "lat": -28.4083,
+      "lon": -54.9608
+    }
+  ],
+  "biodiesel": {
+    "mistura": "B15",
+    "desde": "2025-08-01",
+    "fonte": "CNPE (reunião de 25/06/2025): biodiesel no diesel de 14% para 15% a partir de 1º/08/2025; B16 da Lei do Combustível do Futuro ainda não implementado"
+  },
+  "frete_minimo": {
+    "referencia": 7.33,
+    "semana_ref": "20 a 26/09/2026",
+    "ato": "Portaria SUROC nº 22/2026",
+    "vigencia": "2026-09-30",
+    "gatilho_pct": 5,
+    "regra": "Lei 13.703/2018, art. 5º, § 3º: novos pisos sempre que o diesel S10 (média Brasil, ANP) variar mais de 5% desde a última referência",
+    "historico": [
+      {
+        "data": "2026-01-20",
+        "texto": "Resolução ANTT nº 6.076/2026 revisa a metodologia do piso (carga de maior valor, quando o piso não se aplica)"
+      },
+      {
+        "data": "2026-03-13",
+        "ref": 6.89,
+        "texto": "Portaria SUROC nº 3/2026: diesel de R$ 6,08 para R$ 6,89 (+13,3%)"
+      },
+      {
+        "data": "2026-07-17",
+        "texto": "Resolução ANTT nº 6.084/2026: novos coeficientes e multas de até R$ 1 milhão para frete abaixo do piso"
+      },
+      {
+        "data": "2026-09-30",
+        "ref": 7.33,
+        "texto": "Portaria SUROC nº 22/2026: diesel de referência R$ 7,33/L"
+      }
+    ]
+  },
+  "reforma": {
+    "fonte": "EC 132/2023 e LC 214/2025 · Agência Senado, Omie, Barbieri Advogados",
+    "marcos": [
+      {
+        "ano": 2026,
+        "titulo": "Ano de teste",
+        "texto": "Notas destacam CBS 0,9% e IBS 0,1%, sem cobrança efetiva. Campos de IBS/CBS obrigatórios na NF-e e no CT-e desde 03/08/2026."
+      },
+      {
+        "ano": 2027,
+        "titulo": "CBS passa a ser cobrada",
+        "texto": "PIS e Cofins extintos; entra o Imposto Seletivo; IPI zerado, exceto Zona Franca de Manaus."
+      },
+      {
+        "ano": 2028,
+        "titulo": "IBS ainda em teste",
+        "texto": "IBS segue com alíquota de teste em 2027 e 2028, convivendo com ICMS e ISS."
+      },
+      {
+        "ano": 2029,
+        "titulo": "Começa a troca ICMS/ISS → IBS",
+        "texto": "De 2029 a 2032, ICMS e ISS caem um décimo por ano e o IBS sobe na mesma proporção."
+      },
+      {
+        "ano": 2033,
+        "titulo": "Modelo completo",
+        "texto": "ICMS e ISS extintos; IBS e CBS (IVA dual) em definitivo."
+      }
+    ]
+  },
+  "destaques": [
+    {
+      "tela": "safra",
+      "valido_ate": "2026-12-12",
+      "titulo": "CONAB, 2º levantamento 2026/27 (13/11):",
+      "texto": "safra de grãos estimada em 366,1 milhões de t, +1,3% sobre a anterior e −0,3% frente ao levantamento de outubro; as chuvas no RS explicam parte do corte. Trigo: 5,3 milhões de t (−33,2%), com menor área e clima desfavorável no PR e no RS.",
+      "impacto": "Volume total alto sustenta a demanda de frete na colheita de 2027; trigo menor reduz o fluxo do RS para moinhos e portos.",
+      "fonte": "CONAB, 13/11/2026 (via BrasilAgro e A Crítica)"
+    },
+    {
+      "tela": "safra",
+      "valido_ate": "2026-12-03",
+      "titulo": "Emater/RS (12/11):",
+      "texto": "soja com 39% semeados de 6,64 milhões de ha; no Norte, chuvas frequentes travaram máquinas e atrasaram o plantio, com erosão e granizo pontuais. Trigo com 76% colhidos de 763,1 mil ha e PH comprometido em parte das áreas. Milho com 84% plantados.",
+      "impacto": "Plantio atrasado no Norte do RS (região de Passo Fundo) empurra a colheita da soja e encurta a janela do milho safrinha.",
+      "fonte": "Informativo Conjuntural Emater/RS, 12/11/2026 (via Revista Cultivar)"
+    }
+  ]
 }

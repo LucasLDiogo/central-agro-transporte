@@ -271,13 +271,14 @@ const TELAS = {
     return { texto: 'Presta atenção nesse vídeo, **parceiro de estrada**!', tom: 'ok' };
   } },
 };
+if (typeof TELAS_NEGOCIO !== 'undefined') Object.assign(TELAS, TELAS_NEGOCIO); // paineis-negocio.js
 function videos() { const u = params.get('video'); const extra = u ? [/^[\w-]{11}$/.test(u) ? { youtube: u, titulo: 'Vídeo' } : { src: u, titulo: 'Vídeo' }] : []; return [...extra, ...(E.cfg?.videos || [])]; }
 function saudacao() { const h = new Date().getHours(); return h < 12 ? '**Bom dia, comboio!**' : h < 18 ? 'Boa tarde, **parceiro de estrada**!' : 'Boa noite, **comboio**! Farol baixo e atenção.'; }
 
 /* ------------------------------------------------------------------ avatar: BeTruck
    Caminhão-tanque Be8 BeVant em SVG animado (assets/betruck/betruck.js). Mantém a mesma interface do avatar antigo
    (tocar, falar, bocejar, dormir, acordar, ocioso...) para o resto do painel continuar igual. */
-const TELAS_INDICADOR = new Set(['clima', 'mercado', 'comparativo', 'rota']);
+const TELAS_INDICADOR = new Set(['clima', 'mercado', 'comparativo', 'rota', 'energia', 'combustiveis', 'safra', 'frete', 'cenario']);
 const Avatar = {
   estado: 'acordado', ocupadoAte: 0, ultimoBocejo: Date.now(), atual: 'repouso', bt: null, vez: -1,
   iniciar() {
@@ -320,7 +321,7 @@ const Avatar = {
     if (tom === 'alerta') { if (TELAS_INDICADOR.has(Show.atual)) return this.alerta(true); return bt.expressao('bravo', false), setTimeout(() => bt.piscadinha(), 1800); }
     if (gesto === false) return; // so o balao, sem trocar o gesto em andamento
     if (tom === 'festa') return void bt.comemorar();
-    const mapa = { pensa: () => bt.pensar(2.5), aceno: () => bt.acenar(), surpresa: () => bt.surpresa(), joinha: () => bt.joinha(), risada: () => bt.comemorar() };
+    const mapa = { pensa: () => bt.pensar(2.5), aceno: () => bt.acenar(), surpresa: () => bt.surpresa(), joinha: () => bt.joinha(), risada: () => bt.comemorar(), bevant: () => bt.bevant() };
     (mapa[gesto] || (() => bt.expressao(Math.random() < .5 ? 'radiante' : 'feliz', false)))();
   },
   /* gracinha com frase: atraso em ms, ou 'fim' para falar quando o gesto termina */

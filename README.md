@@ -30,6 +30,20 @@ Parâmetros opcionais no endereço: `?tela=mercado` (começa nessa tela), `?seg=
 - `telas.segundosPorTela` e `telas.ordem`: tempo e ordem das telas.
 - `avatar.bocejaAposSeg` / `avatar.dormeAposSeg`: tempo até o avatar bocejar e, com o painel pausado, dormir.
 
+## Telas de negócio (paineis-negocio.js)
+
+| Tela | O que mostra | Atualização |
+| --- | --- | --- |
+| Energia & biocombustível | Óleo de soja, diesel NY, Brent e farelo (futuros) com conversão para reais; biodiesel × diesel A × PPI × diesel B S10 da síntese semanal da ANP; mistura obrigatória | cotações a cada 20 min no coletor e a tela recarrega sozinha a cada 2 min enquanto está no ar |
+| Combustíveis mês a mês | Diesel S10, gasolina e etanol: média mensal RS × Brasil (24 meses) e diesel S10 posto a posto nas cidades do corredor | ANP mensal e postos (últimas 4 semanas), a cada 12 h |
+| Soja e trigo | Preço recebido pelo produtor (RS × PR) mês a mês e a safra de soja do RS levantamento a levantamento; destaques do campo (CONAB, Emater) com data de validade | CONAB, a cada 12 h |
+| Frete mínimo & reforma | Diesel de referência da ANTT, posição do diesel atual no gatilho de ±5% e histórico de 2026; calendário da reforma tributária (2026 a 2033) | ANP semanal; textos fixos em `config.json` |
+| Cenário & impactos | Leitura automática por regras: chuva forte nas regiões produtoras na janela de plantio (risco de replantio), chuva na colheita do trigo, gatilho do frete, diesel importado × refinaria, custo do B15, óleo de soja, revisão da safra, dólar | a cada coleta |
+
+As regras do cenário ficam em `insights()` no `paineis-negocio.js`; cada item mostra a regra e a fonte. Os textos fixos (frete mínimo, reforma, mistura, destaques do campo) ficam em `config.json` e devem ser revistos quando houver novo reajuste, nova resolução ou novo levantamento.
+
+**Cotações a cada minuto (opcional):** `cotacoes-worker/worker.js` é um Cloudflare Worker que busca os futuros com cache de 60 s e libera CORS. Depois de publicado, coloque o endereço em `config.json` → `cotacoesUrl` e a tela de energia passa a consultar a cada minuto.
+
 ## De onde vêm os dados
 
 | Dado | Fonte | Atualização |
@@ -42,6 +56,12 @@ Parâmetros opcionais no endereço: `?tela=mercado` (começa nessa tela), `?seg=
 | Diesel | Petrobras, via combustivelapi.com.br | coletor |
 | Avisos meteorológicos | INMET | coletor |
 | Notícias | Google Notícias (RSS) | coletor |
+| Óleo de soja, diesel NY, Brent, farelo | CBOT/NYMEX/ICE via Yahoo Finance | coletor, a cada 20 min |
+| Biodiesel, diesel A, PPI, diesel S10 semanal | ANP, Síntese Semanal de Preços (PDF) | coletor, a cada 6 h |
+| Diesel nos postos do corredor | ANP, Levantamento de Preços (CSV das últimas 4 semanas) | coletor, a cada 12 h |
+| Combustíveis mês a mês (RS e Brasil) | ANP, médias mensais de revenda (planilhas desde 2013) | coletor, a cada 12 h |
+| Safra e preço ao produtor | CONAB, Portal de Informações (LevantamentoGraos e PrecosMensalUF) | coletor, a cada 12 h |
+| Chuva nas lavouras do RS | Open-Meteo (14 dias observados + 7 previstos) | coletor |
 
 O coletor (`coletor/coletar.py`) roda no GitHub Actions a cada 20 minutos e publica `dados.json` no ramo `dados`. Se uma fonte falhar, o painel mantém o último valor bom. Nenhum número é inventado: quando não há dado, aparece "—".
 
